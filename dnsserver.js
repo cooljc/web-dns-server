@@ -23,3 +23,46 @@
 
 var dns = require('native-dns');
 var util = require('util');
+
+var server = dns.createServer();
+var record_db = null;
+
+var onRelay = function (domain, response) {
+	var question = dns.Question({
+		name: domain,
+		type: 'A',
+	});
+
+	var req = dns.Request({
+		question: question,
+		server: { address: '8.8.8.8', port: 53, type: 'udp' },
+		timeout: 1000,
+	});
+	req.on('message', function (err, answer) {
+		var entries = [];
+		answer.answer.forEach(function (a) {
+			response.answer.push(dns.A(a));
+		});
+		response.send();
+	});
+	req.send();
+};
+
+var onRequest = function (request, response) {
+	var domain = request.question[0].name;
+	record_db.lookupRecords(response, dns, domain, onRelay);
+};
+
+server.on('request', onRequest);
+
+server.on('error', function (err, buff, req, res) {
+  console.log(err.stack);
+});
+
+function start(db) {
+	record_db = db;
+	console.log('Listening on '+53);
+	server.serve(53);
+};
+
+exports.start = start;

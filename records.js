@@ -75,8 +75,29 @@ function getRecords(res) {
 	});
 };
 
+function lookupRecords(response, dns, domain, relay) {
+	db.all("SELECT * FROM dns WHERE name=? AND enabled=1", domain, function(err, rows) {
+		var len = rows.length;
+		if (len) {
+			for(i=0; i<len; i++) {
+				var entry = {
+					name: rows[i].name,
+					address: rows[i].ipaddress,
+					ttl: rows[i].ttl
+				};
+				response.answer.push(dns.A(entry));
+			}
+			response.send();
+		}
+		else {
+			relay(domain, response);
+		}
+	});
+};
+
 exports.deleteRecord = deleteRecord;
 exports.updateRecord = updateRecord;
 exports.insertRecord = insertRecord;
 exports.getRecord = getRecord;
 exports.getRecords = getRecords;
+exports.lookupRecords = lookupRecords;

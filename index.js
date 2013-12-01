@@ -26,3 +26,4 @@ var dnsserver = require('./dnsserver');
 var db = require('./records');
 
 webserver.start(db);
+dnsserver.start(db);
