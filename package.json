@@ -1,0 +1,10 @@
+{
+  "name"           : "web-dns-server",
+  "dependencies"   : {
+                      "native-dns" : "*",
+                      "sqlite3" : "*",
+                      "express": "3.x"
+                     },
+  "main"           : "./index.js",
+  "version"        : "0.0.1"
+}
