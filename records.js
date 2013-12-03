@@ -58,6 +58,16 @@ function insertRecord(res, data) {
 	res.send(result);
 };
 
+function enableRecord(res, data) {
+	var stmt = db.prepare("UPDATE dns SET enabled=? WHERE id=?");
+	stmt.run({1: data.enabled, 2: data.id});
+	stmt.finalize();
+	
+	var result = {success: true};
+	res.setHeader('Content-Type', 'text/json');
+	res.send(result);
+};
+
 function getRecord(res, id) {
 	db.all("SELECT * FROM dns WHERE id=? LIMIT 1", id, function(err, rows) {
 		var record = rows[0];
@@ -98,6 +108,7 @@ function lookupRecords(response, dns, domain, relay) {
 exports.deleteRecord = deleteRecord;
 exports.updateRecord = updateRecord;
 exports.insertRecord = insertRecord;
+exports.enableRecord = enableRecord;
 exports.getRecord = getRecord;
 exports.getRecords = getRecords;
 exports.lookupRecords = lookupRecords;

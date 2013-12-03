@@ -26,6 +26,7 @@ var app = express();
 var records_db = null;
 
 app.use(express.static(__dirname + '/www'));
+
 //app.use(express.bodyParser());
 app.use(express.urlencoded());
 app.use(express.json());
@@ -63,6 +64,10 @@ app.get('/ajax/records', function(req, res) {
 
 app.get('/ajax/record', function(req, res) {
 	records_db.getRecord(res, req.query.id);
+});
+
+app.get('/ajax/recordEnable', function(req, res) {
+	records_db.enableRecord(res, {enabled: req.query.enabled, id: req.query.id});
 });
 
 function start(db) {

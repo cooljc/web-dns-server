@@ -57,7 +57,9 @@
 		<div class="row">
 			<div class="col-md-2">
 				<h2>Records:</h2>
-				<button type="button" class="btn btn-default" id="addNew">Add New Record</button>
+				<button type="button" class="btn btn-default" id="addNew">
+					<span class="glyphicon glyphicon-plus-sign"></span> Add New Record
+				</button>
 			</div>
 			<div class="col-md-8" id="tableContiner">
 				<table id="records" class="table table-striped">
@@ -108,33 +110,24 @@
 						<div class="alert" id="addEdit-error-msg"></div>
 						<form name="addEditRecordForm" id="addEditRecordForm">
 							<input type="hidden" name="record_id" id="addEdit-record_id" value="0">
-							<fieldset>
-								<legend>Detail</legend>
-								<div class="control-group">
-									<label class="control-label" for="rname">Name</label>
-									<div class="controls">
-										<input type="text" name="rname" id="rname">
-									</div>
-								</div>
-								<div class="control-group">
-									<label class="control-label" for="rip">IP</label>
-									<div class="controls">
-										<input type="text" name="rip" id="rip">
-									</div>
-								</div>
-								<div class="control-group">
-									<label class="control-label" for="rtt">TTL</label>
-									<div class="controls">
-										<input type="text" name="rttl" id="rttl">
-									</div>
-								</div>
-								<div class="control-group">
-									<label class="control-label" for="renabled">Enabled</label>
-									<div class="controls">
-										<input type="checkbox" name="renabled" id="renabled">
-									</div>
-								</div>
-							<fieldset>
+							<table class="table">
+								<tr>
+									<th>Name</th>
+									<td><input type="text" name="rname" id="rname"></td>
+								</tr>
+								<tr>
+									<th>IP</th>
+									<td><input type="text" name="rip" id="rip"></td>
+								</tr>
+								<tr>
+									<th>TTL</th>
+									<td><input type="text" name="rttl" id="rttl"></td>
+								</tr>
+								<tr>
+									<th>Enabled</th>
+									<td><input type="checkbox" name="renabled" id="renabled"></td>
+								</tr>
+							</table>
 						</form>
 					</div>
 					<div class="modal-footer">
@@ -181,6 +174,36 @@
 			a.append(s);
 			return a;
 			
+		};
+		
+		var enableDisableButton = function(id, state) {
+			var button = $('<a>');
+			var url = '/ajax/recordEnable?id='+id;
+			button.addClass('btn');
+			button.addClass('btn-xs');
+			button.addClass('enable-disable');
+			if (state) {
+				button.addClass('btn-success');
+				button.html('Enabled');
+				url += '&enabled=0';
+			}
+			else {
+				button.addClass('btn-danger');
+				button.html('Disabled');
+				url += '&enabled=1';
+			}
+			button.attr('href',url);
+			return button;
+		};
+		
+		var onEnableDisableClicked = function() {
+			var url = $(this).attr('href');
+			$.getJSON(url, function(data) {
+				if (data.success == true) {
+					loadAddresses();
+				}
+			});
+			return false;
 		};
 		
 		var onDeleteClicked = function() {
@@ -292,7 +315,7 @@
 				row.append(addTableCell(data.records[i].name));
 				row.append(addTableCell(data.records[i].ipaddress));
 				row.append(addTableCell(data.records[i].ttl));
-				row.append(addTableCell(data.records[i].enabled));
+				row.append(addTableCell(enableDisableButton(data.records[i].id, data.records[i].enabled)));
 				row.append(addTableCell(editDeleteIcon(data.records[i].id, 1)));
 				row.append(addTableCell(editDeleteIcon(data.records[i].id, 0)));
 				table.append(row);
@@ -300,6 +323,7 @@
 			$('#records').replaceWith(table);
 			$(".edit").click(onEditClicked);
 			$(".delete").click(onDeleteClicked);
+			$('.enable-disable').click(onEnableDisableClicked);
 			
 		};
 		
